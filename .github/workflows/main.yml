@@ -12,7 +12,7 @@ env:
   ECS_TASK_DEFINITION: 1851-development-growth-api 
   CONTAINER_NAME: app
   CONTAINER_NAME_NGINX: nginx
-  APP_REPOSITORY:  growth-api-ui
+  APP_REPOSITORY: growth-api-ui
   NGINX_REPOSITORY: growth-api-nginx
 
 jobs:
@@ -27,20 +27,20 @@ jobs:
         id: vars
         run: echo "tag=$GITHUB_REF" >> $GITHUB_OUTPUT
 
-
       - name: Build, tag, and push image to Amazon ECRs
         id: build-image
         env:
            ECR_REGISTRY: vamshi
         run: |
-                echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_STATE
-                echo "APP_REPOSITORY=$APP_REPOSITORY" >> $GITHUB_STATE
-                echo "NGINX_REPOSITORY=$NGINX_REPOSITORY" >> $GITHUB_STATE
+           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+           echo "APP_REPOSITORY=$APP_REPOSITORY" >> $GITHUB_ENV
+           echo "NGINX_REPOSITORY=$NGINX_REPOSITORY" >> $GITHUB_ENV
 
-              
-                echo "$APP=$ECR_REGISTRY/$APP_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-                echo "$NGINX=$ECR_REGISTRY/$NGINX_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+      - name: Set output variables
+        id: set-output
+        run: |
+          echo "APP=$ECR_REGISTRY/$APP_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "NGINX=$ECR_REGISTRY/$NGINX_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
   Deployment:
     name: "Deployment"
@@ -54,5 +54,6 @@ jobs:
 
       - name: Set tag
         id: vars
-        run: cat $NGINX
+        run: echo "NGINX=${{ needs.Build.outputs.set-output.NGINX }}"
 
+    
