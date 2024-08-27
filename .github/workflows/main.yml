@@ -25,7 +25,7 @@ jobs:
 
       - name: Set tag
         id: vars
-        run: echo "tag=$GITHUB_REF" >> $GITHUB_OUTPU
+        run: echo "tag=$GITHUB_REF" >> $GITHUB_OUTPUT
 
 
       - name: Build, tag, and push image to Amazon ECRs
