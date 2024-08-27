@@ -39,8 +39,8 @@ jobs:
       - name: Set output variables
         id: set-output
         run: |
-          echo "APP=$ECR_REGISTRY/$APP_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-          echo "NGINX=$ECR_REGISTRY/$NGINX_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "$APP=$ECR_REGISTRY/$APP_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "$NGINX=$ECR_REGISTRY/$NGINX_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
   Deployment:
     name: "Deployment"
@@ -53,6 +53,6 @@ jobs:
 
       - name: Set tag
         id: vars
-        run: echo "NGINX=${{ needs.Build.outputs.set-output.NGINX }}"
+        run: echo "$NGINX"
 
     
