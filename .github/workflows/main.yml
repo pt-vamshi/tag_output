@@ -1,0 +1,58 @@
+name: "1851_Development-API"
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: us-east-1
+  IMAGE_TAG: ${{ github.sha }}
+  ECS_SERVICE: 1851-development-growth-api
+  ECS_CLUSTER: 1851-development    
+  ECS_TASK_DEFINITION: 1851-development-growth-api 
+  CONTAINER_NAME: app
+  CONTAINER_NAME_NGINX: nginx
+  APP_REPOSITORY:  growth-api-ui
+  NGINX_REPOSITORY: growth-api-nginx
+
+jobs:
+  Build:
+    name: "Build"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Checkout Code"
+        uses: "actions/checkout@v2"
+
+      - name: Set tag
+        id: vars
+        run: echo "tag=$GITHUB_REF" >> $GITHUB_OUTPU
+
+
+      - name: Build, tag, and push image to Amazon ECRs
+        id: build-image
+        env:
+           ECR_REGISTRY: vamshi
+        run: |
+                echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_STATE
+                echo "APP_REPOSITORY=$APP_REPOSITORY" >> $GITHUB_STATE
+                echo "NGINX_REPOSITORY=$NGINX_REPOSITORY" >> $GITHUB_STATE
+
+              
+                echo "$APP=$ECR_REGISTRY/$APP_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+                echo "$NGINX=$ECR_REGISTRY/$NGINX_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+  Deployment:
+    name: "Deployment"
+    runs-on: "ubuntu-latest"
+    needs: Build
+    timeout-minutes: 2
+    if: ${{ github.event.inputs.deploy == 'deploy' }}
+    steps:
+      - name: "Checkout Code"
+        uses: "actions/checkout@v2"
+
+      - name: Set tag
+        id: vars
+        run: cat $NGINX
+
